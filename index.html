@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hall Booking System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    .hall-buttons button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: 2px solid #333;
+      background-color: white;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .hall-buttons button.selected {
+      background-color: red;
+      color: white;
+      border-color: red;
+    }
+
+    /* Month-year header and navigation */
+    #monthYearContainer {
+      margin: 20px auto 10px;
+      width: 80%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    #monthYear {
+      user-select: none;
+    }
+
+    #prevMonth, #nextMonth {
+      cursor: pointer;
+      padding: 6px 14px;
+      border: 1.5px solid #333;
+      border-radius: 6px;
+      background-color: white;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+
+    #prevMonth:hover, #nextMonth:hover {
+      background-color: #eee;
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      width: 80%;
+      margin: 0 auto 20px;
+    }
+
+    /* Weekday headers */
+    .calendar .weekday {
+      font-weight: 600;
+      background-color: #ddd;
+      padding: 10px 0;
+      border-radius: 6px;
+      user-select: none;
+    }
+
+    .calendar div {
+      border: 1px solid #ccc;
+      padding: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      user-select: none;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+    }
+
+    .calendar div.empty {
+      cursor: default;
+      background-color: #f9f9f9;
+      border: none;
+    }
+
+    .green {
+      background-color: rgb(29, 246, 9);
+      color: white;
+    }
+
+    .yellow {
+      background-color: rgb(251, 12, 12);
+      color: black;
+    }
+
+    .form-container {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      padding: 20px 30px;
+      border: 2px solid #444;
+      border-radius: 12px;
+      background-color: #fff;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+      text-align: left;
+      z-index: 1500;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Close button */
+    .form-close {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      background: none;
+      border: none;
+      color: #e74c3c;
+      font-weight: 700;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    /* Form labels and inputs inline grouping */
+    #bookingForm label {
+      display: inline-block;
+      width: 120px;
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    #bookingForm input[type="text"],
+    #bookingForm input[type="number"] {
+      padding: 8px 10px;
+      width: calc(50% - 140px);
+      margin-bottom: 14px;
+      border: 1.5px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: border-color 0.3s ease;
+    }
+
+    #bookingForm input[type="text"]:focus,
+    #bookingForm input[type="number"]:focus {
+      border-color: #2ecc71;
+      outline: none;
+    }
+
+    /* Advance and Price wrapper - horizontal inline */
+    .advance-price-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .advance-price-container label {
+      width: auto;
+      margin-bottom: 0;
+    }
+
+    .advance-price-container input {
+      width: 120px !important;
+    }
+
+    .advance-price-container span {
+      font-weight: 700;
+      font-size: 18px;
+      color: #2ecc71;
+    }
+
+    /* Buttons container with horizontal layout */
+    .buttons-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    /* All buttons same height & style */
+    .buttons-container button {
+      flex: 1;
+      padding: 10px 0;
+      font-weight: 700;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      color: white;
+      user-select: none;
+    }
+
+    /* Specific buttons color */
+    .buttons-container button.mark-btn {
+      background-color: #f39c12;
+    }
+
+    .buttons-container button.save-btn {
+      background-color: #27ae60;
+    }
+
+    .buttons-container button.delete-btn {
+      background-color: #e74c3c;
+    }
+
+    /* Hover effect */
+    .buttons-container button:hover {
+      filter: brightness(1.1);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Hall Booking System</h1>
+
+  <div class="hall-buttons">
+    <button onclick="selectHall('MarriageHall')" id="btnMarriageHall">Marriage Hall</button>
+    <button onclick="selectHall('BanquetHall')" id="btnBanquetHall">Banquet Hall</button>
+  </div>
+
+  <!-- Month-Year and navigation -->
+  <div id="monthYearContainer">
+    <button id="prevMonth">&lt; Prev</button>
+    <div id="monthYear">Month Year</div>
+    <button id="nextMonth">Next &gt;</button>
+  </div>
+
+  <div id="calendar" class="calendar"></div>
+
+  <div class="form-container" id="formContainer">
+    <button class="form-close" onclick="closeForm()">×</button>
+    <h2>Booking Details</h2>
+    <form id="bookingForm">
+      <input type="text" id="name" placeholder="Name" required><br>
+      <input type="text" id="mobile" placeholder="Mobile Number" required><br>
+      <input type="text" id="function" placeholder="Function Name" required><br>
+
+      <div class="advance-price-container">
+        <label for="price">Price</label>
+        <input type="number" id="price" placeholder="Price" min="0" step="0.01" required>
+
+        <label for="advance">Advance</label>
+        <input type="number" id="advance" placeholder="Advance Amount" min="0" step="0.01" required>
+
+        <label for="remaining">Remaining</label>
+        <input type="number" id="remaining" placeholder="Remaining Amount" readonly>
+        <span>₹</span>
+      </div>
+
+      <div class="buttons-container">
+        <button type="button" class="mark-btn" onclick="markOnly()">Mark as Date</button>
+        <button type="submit" class="save-btn">Save</button>
+        <button type="button" class="delete-btn" onclick="deleteBooking()"> 🗑 </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+  <script>
+    // Your Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBiY9bZvDl-J0g6gtp-kqiWikbeldfgixM",
+      authDomain: "hallbookingsystem-f1550.firebaseapp.com",
+      databaseURL: "https://hallbookingsystem-f1550-default-rtdb.firebaseio.com",
+      projectId: "hallbookingsystem-f1550",
+      storageBucket: "hallbookingsystem-f1550.appspot.com",
+      messagingSenderId: "827165182854",
+      appId: "1:827165182854:web:42a566e6e2950c50e0abf0"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let selectedHall = "";
+    let selectedDate = null;
+    let bookingData = null;
+
+    const calendarEl = document.getElementById("calendar");
+    const formContainer = document.getElementById("formContainer");
+    const bookingForm = document.getElementById("bookingForm");
+
+    const priceInput = document.getElementById("price");
+    const advanceInput = document.getElementById("advance");
+    const remainingInput = document.getElementById("remaining");
+
+    // Month-Year display and current date tracking
+    const monthYearEl = document.getElementById("monthYear");
+    const prevMonthBtn = document.getElementById("prevMonth");
+    const nextMonthBtn = document.getElementById("nextMonth");
+
+    let today = new Date();
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth(); // 0-based
+
+    // Helper: month names
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    // Show selected hall visually
+    function selectHall(hallName) {
+      selectedHall = hallName;
+
+      // Highlight buttons
+      document.getElementById("btnMarriageHall").classList.toggle("selected", hallName === "MarriageHall");
+      document.getElementById("btnBanquetHall").classList.toggle("selected", hallName === "BanquetHall");
+
+      // Reset calendar & form
+      selectedDate = null;
+      bookingData = null;
+      closeForm();
+
+      renderCalendar(currentYear, currentMonth);
+    }
+
+    // Render calendar with current year and month
+    function renderCalendar(year, month) {
+      calendarEl.innerHTML = "";
+
+      // Show Month Year
+      monthYearEl.textContent = `${monthNames[month]} ${year}`;
+
+      // Weekday headers
+      const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      weekdays.forEach(day => {
+        const wdEl = document.createElement("div");
+        wdEl.classList.add("weekday");
+        wdEl.textContent = day;
+        calendarEl.appendChild(wdEl);
+      });
+
+      // Calculate first day of month and total days in month
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      // Fill empty cells before the first day
+      for (let i = 0; i < firstDay; i++) {
+        const emptyCell = document.createElement("div");
+        emptyCell.classList.add("empty");
+        calendarEl.appendChild(emptyCell);
+      }
+
+      // Add days
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayEl = document.createElement("div");
+        dayEl.textContent = day;
+
+        // Date object for this day
+        const dateObj = new Date(year, month, day);
+
+        dayEl.onclick = () => {
+          if (!selectedHall) {
+            alert("Please select a hall first.");
+            return;
+          }
+          selectedDate = dateObj;
+          openForm(dateObj);
+        };
+
+        // Load booking status from Firebase and color code
+        checkBookingStatus(year, month, day, dayEl);
+
+        calendarEl.appendChild(dayEl);
+      }
+    }
+
+    // Check booking status and update day color
+    function checkBookingStatus(year, month, day, dayEl) {
+      if (!selectedHall) return;
+
+      const dateKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+      const bookingRef = db.ref(`halls/${selectedHall}/dates/${dateKey}`);
+      bookingRef.once("value").then(snapshot => {
+        const data = snapshot.val();
+        if (data) {
+          if (data.advance === data.price) {
+            dayEl.classList.add("green");
+          } else if (data.advance > 0 && data.advance < data.price) {
+            dayEl.classList.add("yellow");
+          }
+        } else {
+          dayEl.classList.remove("green", "yellow");
+        }
+      });
+    }
+
+    // Open form and populate if booking exists
+    function openForm(dateObj) {
+      formContainer.style.display = "block";
+
+      const dateKey = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, "0")}-${String(dateObj.getDate()).padStart(2, "0")}`;
+
+      // Clear form first
+      bookingForm.reset();
+      remainingInput.value = "";
+
+      const bookingRef = db.ref(`halls/${selectedHall}/dates/${dateKey}`);
+      bookingRef.once("value").then(snapshot => {
+        bookingData = snapshot.val();
+
+        if (bookingData) {
+          // Populate
+          document.getElementById("name").value = bookingData.name || "";
+          document.getElementById("mobile").value = bookingData.mobile || "";
+          document.getElementById("function").value = bookingData.function || "";
+          priceInput.value = bookingData.price || "";
+          advanceInput.value = bookingData.advance || "";
+          updateRemaining();
+        }
+      });
+    }
+
+    // Close form
+    function closeForm() {
+      formContainer.style.display = "none";
+      bookingData = null;
+      selectedDate = null;
+      bookingForm.reset();
+    }
+
+    // Update remaining amount dynamically
+    function updateRemaining() {
+      const price = parseFloat(priceInput.value) || 0;
+      const advance = parseFloat(advanceInput.value) || 0;
+      let remaining = price - advance;
+      if (remaining < 0) remaining = 0;
+      remainingInput.value = remaining.toFixed(2);
+    }
+
+    priceInput.addEventListener("input", updateRemaining);
+    advanceInput.addEventListener("input", updateRemaining);
+
+    // Mark Only button action - saves date without details (advance=0, price=0)
+    function markOnly() {
+      if (!selectedDate || !selectedHall) return;
+
+      const dateKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
+
+      const bookingRef = db.ref(`halls/${selectedHall}/dates/${dateKey}`);
+      bookingRef.set({
+        name: "",
+        mobile: "",
+        function: "",
+        price: 0,
+        advance: 0,
+      }).then(() => {
+        alert("Date marked successfully.");
+        renderCalendar(currentYear, currentMonth);
+        closeForm();
+      }).catch(e => {
+        alert("Error marking date: " + e.message);
+      });
+    }
+
+    // Save booking on form submit
+    bookingForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!selectedDate || !selectedHall) return;
+
+      const name = document.getElementById("name").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
+      const func = document.getElementById("function").value.trim();
+      const price = parseFloat(priceInput.value) || 0;
+      const advance = parseFloat(advanceInput.value) || 0;
+
+      if (!name || !mobile || !func) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+
+      if (advance > price) {
+        alert("Advance amount cannot be greater than price.");
+        return;
+      }
+
+      const dateKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
+
+      const bookingRef = db.ref(`halls/${selectedHall}/dates/${dateKey}`);
+      bookingRef.set({
+        name: name,
+        mobile: mobile,
+        function: func,
+        price: price,
+        advance: advance,
+      }).then(() => {
+        alert("Booking saved successfully.");
+        renderCalendar(currentYear, currentMonth);
+        closeForm();
+      }).catch(e => {
+        alert("Error saving booking: " + e.message);
+      });
+    });
+
+    // Delete booking
+    function deleteBooking() {
+      if (!selectedDate || !selectedHall) return;
+
+      if (!confirm("Are you sure you want to delete this booking?")) return;
+
+      const dateKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
+
+      const bookingRef = db.ref(`halls/${selectedHall}/dates/${dateKey}`);
+      bookingRef.remove().then(() => {
+        alert("Booking deleted.");
+        renderCalendar(currentYear, currentMonth);
+        closeForm();
+      }).catch(e => {
+        alert("Error deleting booking: " + e.message);
+      });
+    }
+
+    // Navigation buttons for month change
+    prevMonthBtn.addEventListener("click", () => {
+      if (currentMonth === 0) {
+        currentMonth = 11;
+        currentYear--;
+      } else {
+        currentMonth--;
+      }
+      renderCalendar(currentYear, currentMonth);
+    });
+
+    nextMonthBtn.addEventListener("click", () => {
+      if (currentMonth === 11) {
+        currentMonth = 0;
+        currentYear++;
+      } else {
+        currentMonth++;
+      }
+      renderCalendar(currentYear, currentMonth);
+    });
+
+    // Initialize - user must select hall first
+    renderCalendar(currentYear, currentMonth);
+  </script>
+</body>
+</html>

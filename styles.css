@@ -1,0 +1,410 @@
+ body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    .hall-buttons button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: 2px solid #333;
+      background-color: white;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .hall-buttons button.selected {
+      background-color: red;
+      color: white;
+      border-color: red;
+    }
+
+    /* Month-year header and navigation */
+    #monthYearContainer {
+      margin: 20px auto 10px;
+      width: 80%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    #monthYear {
+      user-select: none;
+    }
+
+    #prevMonth, #nextMonth {
+      cursor: pointer;
+      padding: 6px 14px;
+      border: 1.5px solid #333;
+      border-radius: 6px;
+      background-color: white;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+
+    #prevMonth:hover, #nextMonth:hover {
+      background-color: #eee;
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      width: 80%;
+      margin: 0 auto 20px;
+    }
+
+    /* Weekday headers */
+    .calendar .weekday {
+      font-weight: 600;
+      background-color: #ddd;
+      padding: 10px 0;
+      border-radius: 6px;
+      user-select: none;
+    }
+
+    .calendar div {
+      border: 1px solid #ccc;
+      padding: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      user-select: none;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+    }
+
+    .calendar div.empty {
+      cursor: default;
+      background-color: #f9f9f9;
+      border: none;
+    }
+
+    .green {
+      background-color: rgb(29, 246, 9);
+      color: white;
+    }
+
+    .yellow {
+      background-color: #b2fba5;
+      color: black;
+    }
+
+    .form-container {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      padding: 20px 30px;
+      border: 2px solid #444;
+      border-radius: 12px;
+      background-color: #fff;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+      text-align: left;
+      z-index: 1500;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Close button */
+    .form-close {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      background: none;
+      border: none;
+      color: #e74c3c;
+      font-weight: 700;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    /* Form labels and inputs inline grouping */
+    #bookingForm label {
+      display: inline-block;
+      width: 120px;
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    #bookingForm input[type="text"],
+    #bookingForm input[type="number"] {
+      padding: 8px 10px;
+      width: calc(50% - 140px);
+      margin-bottom: 14px;
+      border: 1.5px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: border-color 0.3s ease;
+    }
+
+    #bookingForm input[type="text"]:focus,
+    #bookingForm input[type="number"]:focus {
+      border-color: #2ecc71;
+      outline: none;
+    }
+
+    /* Advance and Price wrapper - horizontal inline */
+    .advance-price-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .advance-price-container label {
+      width: auto;
+      margin-bottom: 0;
+    }
+
+    .advance-price-container input {
+      width: 120px !important;
+    }
+
+    .advance-price-container span {
+      font-weight: 700;
+      font-size: 18px;
+      color: #2ecc71;
+    }
+
+    /* Buttons container with horizontal layout */
+    .buttons-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    /* All buttons same height & style */
+    .buttons-container button {
+      flex: 1;
+      padding: 10px 0;
+      font-weight: 700;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      color: white;
+      user-select: none;
+    }
+
+    /* Specific buttons color */
+    .buttons-container button.mark-btn {
+      background-color: #f39c12;
+    }
+
+    .buttons-container button.save-btn {
+      background-color: #27ae60;
+    }
+
+    .buttons-container button.delete-btn {
+      background-color: #e74c3c;
+    }
+
+    /* Hover effect */
+    .buttons-container button:hover {
+      filter: brightness(1.1);
+    }
+
+  
+
+@media  (min-width: 480px) {
+  body {
+    font-size: 18px;
+    background: linear-gradient(to right, #f7f8fa, #e6ecf0);
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+  }
+
+  #monthYearContainer {
+        width: 90%;
+        margin: 40px auto 20px;
+        font-size: 48px;
+        font-weight: 700;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(to right, #ffffff, #f3f3f3);
+        padding: 15px 20px;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+  #prevMonth,
+  #nextMonth {
+    padding: 12px 20px;
+    font-size: 18px;
+    background: linear-gradient(to right, #f5f5f5, #e0e0e0);
+    border: 2px solid #aaa;
+    border-radius: 10px;
+    cursor: pointer;
+            font-size: 30px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+  }
+
+  #prevMonth:hover,
+  #nextMonth:hover {
+    background-color: #ddd;
+    border-color: #888;
+            font-size: 30px;
+  }
+
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 22px;
+    width: 92%;
+    margin: 30px auto 40px;
+    padding: 30px 20px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  }
+
+      .calendar .weekday {
+        background: linear-gradient(to right, #6dd5fa, #2980b9);
+        color: white;
+        font-size: 23px;
+        padding: 16px 0;
+        border-radius: 8px;
+    }
+
+
+     .calendar div {
+        font-size: 52px;
+        font-weight: bold;
+        background: linear-gradient(135deg, #ffffff, #f2f2f2);
+        border: 3px solid #ddd;
+        padding: 20px 0;
+        text-align: center;
+        border-radius: 12px;
+        transition: all 0.25s ease-in-out;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+  .calendar div:hover:not(.empty) {
+    background: linear-gradient(to right, #ffd5d5, #ffeaea);
+    border-color: #e74c3c;
+    color: #c0392b;
+    transform: scale(1.05);
+  }
+
+  .calendar div.empty {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    cursor: default;
+  }
+
+  .hall-buttons {
+    width: 90%;
+    margin: 30px auto;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+  }
+
+  .hall-buttons button {
+    padding: 25px 60px;
+    font-size: 36px;
+    border: 4px solid #2c3e50;
+    background: linear-gradient(to right, #ffffff, #f0f0f0);
+    border-radius: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+    color: #2c3e50;
+  }
+
+  .hall-buttons button:hover {
+    background: linear-gradient(to right, #d6f1ff, #a8e0ff);
+    color: #1f618d;
+    border-color: #1f618d;
+  }
+
+  .hall-buttons button.selected {
+    background: linear-gradient(to right, #e74c3c, #f1948a);
+    color: white;
+    border-color: #c0392b;
+    box-shadow: 0 4px 14px rgba(231, 76, 60, 0.5);
+    transform: scale(1.03);
+  }
+
+  .green {
+    background: linear-gradient(to right, #27ae60, #2ecc71);
+    color: rgb(212, 209, 20) !important;
+  }
+
+  .yellow {
+    background: linear-gradient(to right, #f1c40f, #f39c12);
+    color: #3cd728 !important;
+  }
+     .form-container {
+        width: 760px;
+        padding: 42px 61px;
+        font-size: 37px;
+        border-radius: 16px;
+    }
+     #bookingForm label {
+        width: 150px;
+        margin-bottom: 17px;
+        font-size: 45px;
+        margin-left: -598px;
+        align-items: flex-start;
+    }
+
+  #bookingForm input[type="text"], #bookingForm input[type="number"] {
+        padding: 30px 59px;
+        width: calc(112% - 185px);
+        margin-bottom: 45px;
+        font-size: 42px;
+        margin-top: -27px;
+    }
+
+  
+    .advance-price-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    width: 100%;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
+    align-content: flex-start;
+}
+
+  .advance-price-container input {
+    width: 670px !important;
+    padding: 10px 12px;
+    font-size: 16px;
+  }
+
+  .advance-price-container span {
+    font-size: 20px;
+  }
+
+  .buttons-container {
+    gap: 18px;
+    margin-top: 20px;
+  }
+
+ .buttons-container button {
+        padding: 24px 0;
+        font-size: 32px;
+        border-radius: 1px;
+    }
+
+
+}
